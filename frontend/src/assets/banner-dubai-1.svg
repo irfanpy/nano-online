@@ -1,0 +1,31 @@
+<svg width="1600" height="780" viewBox="0 0 1600 780" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Dubai skyline and home helper services</title>
+  <desc id="desc">Illustrated banner representing family support services in Dubai.</desc>
+  <defs>
+    <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b5d78"/>
+      <stop offset="100%" stop-color="#f0932b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="780" fill="url(#bg1)"/>
+  <circle cx="1260" cy="160" r="92" fill="#fff0cf" opacity="0.85"/>
+  <rect x="0" y="480" width="1600" height="300" fill="#0d3f54" opacity="0.62"/>
+  <g fill="#f8fbff" opacity="0.92">
+    <rect x="220" y="250" width="70" height="240"/>
+    <rect x="305" y="180" width="90" height="310"/>
+    <rect x="415" y="220" width="75" height="270"/>
+    <rect x="515" y="150" width="110" height="340"/>
+    <rect x="660" y="260" width="80" height="230"/>
+    <rect x="760" y="210" width="65" height="280"/>
+    <rect x="845" y="165" width="110" height="325"/>
+    <rect x="980" y="235" width="86" height="255"/>
+  </g>
+  <g fill="#ffffff" opacity="0.97">
+    <rect x="1060" y="390" width="330" height="230" rx="26"/>
+    <circle cx="1125" cy="468" r="32" fill="#0b5d78"/>
+    <rect x="1170" y="448" width="180" height="20" rx="10" fill="#0b5d78"/>
+    <rect x="1170" y="484" width="145" height="16" rx="8" fill="#86abc1"/>
+    <rect x="1090" y="536" width="270" height="16" rx="8" fill="#86abc1"/>
+    <rect x="1090" y="564" width="220" height="16" rx="8" fill="#86abc1"/>
+  </g>
+</svg>
