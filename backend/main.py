@@ -17,6 +17,7 @@ from schemas import LoginRequest, ProfileResponse, TokenResponse
 from routers import (
     assignments,
     availability,
+    bookings,
     documents,
     employers,
     experience,
@@ -24,8 +25,10 @@ from routers import (
     helpers,
     job_requests,
     locations,
+    public_helpers,
     skills,
     stats,
+    user_auth,
 )
 
 app = FastAPI(title="Nano.Online API", version="1.0.0")
@@ -76,6 +79,9 @@ def get_me(current_user: User = Depends(get_current_user)):
 app.include_router(locations.router)
 app.include_router(helper_roles.router)
 app.include_router(helpers.router)
+app.include_router(public_helpers.router)
+app.include_router(user_auth.router)
+app.include_router(bookings.router)
 app.include_router(employers.router)
 app.include_router(job_requests.router)
 app.include_router(assignments.router)

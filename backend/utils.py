@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from models import (
     AvailabilitySchedule,
+    Booking,
     Employer,
     Helper,
     HelperAssignment,
@@ -18,12 +19,15 @@ from models import (
 from schemas import (
     AssignmentResponse,
     AvailabilityResponse,
+    BookingResponse,
     DocumentResponse,
     EmployerResponse,
     ExperienceResponse,
     HelperResponse,
     JobRequestResponse,
     LocationResponse,
+    PublicHelperDetailResponse,
+    PublicHelperResponse,
 )
 
 
@@ -202,6 +206,30 @@ def validate_availability_overlap(
             )
 
 
+def validate_booking_conflict(
+    db: Session,
+    helper_id: int,
+    date_value: date,
+    start_time: time,
+    end_time: time,
+    current_id: int | None = None,
+) -> None:
+    if start_time >= end_time:
+        raise HTTPException(status_code=400, detail="End time must be after start time")
+
+    query = db.query(Booking).filter(
+        Booking.helper_id == helper_id,
+        Booking.date == date_value,
+        Booking.status != "cancelled",
+    )
+    if current_id is not None:
+        query = query.filter(Booking.id != current_id)
+
+    for booking in query.all():
+        if start_time < booking.end_time and end_time > booking.start_time:
+            raise HTTPException(status_code=400, detail="Helper is already booked")
+
+
 # ── Response converters ────────────────────────────────
 
 def to_location_response(location: Location) -> LocationResponse:
@@ -217,6 +245,7 @@ def to_helper_response(helper: Helper) -> HelperResponse:
         role_id=helper.role_id,
         role_name=helper.role.name,
         notes=helper.notes,
+        hourly_rate=helper.hourly_rate,
         is_active=helper.is_active,
         location_id=helper.location_id,
         location_name=helper.location.area_name if helper.location else None,
@@ -305,4 +334,54 @@ def to_document_response(document: HelperDocument) -> DocumentResponse:
         expiry_date=document.expiry_date,
         document_status=document.document_status,
         notes=document.notes,
+    )
+
+
+def to_public_helper_response(helper: Helper) -> PublicHelperResponse:
+    availability = [AvailabilityResponse.model_validate(s) for s in helper.availability_schedules]
+    skills = [skill for skill in helper.skills]
+    return PublicHelperResponse(
+        id=helper.id,
+        full_name=helper.full_name,
+        role_name=helper.role.name,
+        notes=helper.notes,
+        hourly_rate=helper.hourly_rate,
+        is_active=helper.is_active,
+        location_name=helper.location.area_name if helper.location else None,
+        availability=availability,
+        skills=skills,
+    )
+
+
+def to_public_helper_detail_response(helper: Helper) -> PublicHelperDetailResponse:
+    availability = [AvailabilityResponse.model_validate(s) for s in helper.availability_schedules]
+    skills = [skill for skill in helper.skills]
+    experience = [to_experience_response(record) for record in helper.experience_records]
+    return PublicHelperDetailResponse(
+        id=helper.id,
+        full_name=helper.full_name,
+        role_name=helper.role.name,
+        notes=helper.notes,
+        hourly_rate=helper.hourly_rate,
+        is_active=helper.is_active,
+        location_name=helper.location.area_name if helper.location else None,
+        availability=availability,
+        skills=skills,
+        experience=experience,
+    )
+
+
+def to_booking_response(booking: Booking) -> BookingResponse:
+    return BookingResponse(
+        id=booking.id,
+        user_id=booking.user_id,
+        helper_id=booking.helper_id,
+        helper_name=booking.helper.full_name,
+        date=booking.date,
+        start_time=booking.start_time,
+        end_time=booking.end_time,
+        status=booking.status,
+        total_price=booking.total_price,
+        created_at=booking.created_at,
+        has_review=booking.review is not None,
     )

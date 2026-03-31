@@ -1,6 +1,9 @@
 export const API_BASE =
   import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
+const USER_TOKEN_KEY = "nano_online_user_token";
+const ADMIN_TOKEN_KEY = "nano_online_token";
+
 async function request(path, token, options = {}) {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
@@ -12,6 +15,19 @@ async function request(path, token, options = {}) {
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      if (path.startsWith("/api/")) {
+        localStorage.removeItem(USER_TOKEN_KEY);
+        if (window.location.pathname !== "/login") {
+          window.location.assign("/login");
+        }
+      } else {
+        localStorage.removeItem(ADMIN_TOKEN_KEY);
+        if (window.location.pathname !== "/admin/login") {
+          window.location.assign("/admin/login");
+        }
+      }
+    }
     const error = await response.json().catch(() => ({}));
     throw new Error(error.detail || "Request failed");
   }
@@ -357,5 +373,77 @@ export async function updateDocument(token, id, payload) {
 export async function deleteDocument(token, id) {
   return request(`/documents/${id}`, token, {
     method: "DELETE"
+  });
+}
+
+// ── User-facing APIs ─────────────────────────────────
+
+export async function registerUser(payload) {
+  return request("/api/auth/register", null, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function loginUser({ email, password }) {
+  return request("/api/auth/login", null, {
+    method: "POST",
+    body: JSON.stringify({ email, password })
+  });
+}
+
+export async function fetchUserProfile(token) {
+  return request("/api/auth/me", token);
+}
+
+export async function getPublicHelpers(params = {}) {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.set(key, value);
+    }
+  });
+  const suffix = searchParams.toString() ? `?${searchParams.toString()}` : "";
+  return request(`/api/helpers${suffix}`, null);
+}
+
+export async function getPublicHelper(id) {
+  return request(`/api/helpers/${id}`, null);
+}
+
+export async function createBooking(token, payload) {
+  return request("/api/bookings", token, {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function getUserBookings(token) {
+  return request("/api/bookings/user", token);
+}
+
+export async function cancelBooking(token, id) {
+  return request(`/api/bookings/${id}/cancel`, token, {
+    method: "PUT"
+  });
+}
+
+export async function rescheduleBooking(token, id, payload) {
+  return request(`/api/bookings/${id}/reschedule`, token, {
+    method: "PUT",
+    body: JSON.stringify(payload)
+  });
+}
+
+export async function completeBooking(token, id) {
+  return request(`/api/bookings/${id}/complete`, token, {
+    method: "PUT"
+  });
+}
+
+export async function createBookingReview(token, id, payload) {
+  return request(`/api/bookings/${id}/review`, token, {
+    method: "POST",
+    body: JSON.stringify(payload)
   });
 }

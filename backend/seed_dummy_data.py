@@ -164,6 +164,7 @@ def ensure_helpers(db, admin_id):
                 phone=f"050700{seq:04d}",
                 address=f"Villa {seq}, {location.area_name}, {location.city}",
                 notes="Experienced with UAE family routines",
+                hourly_rate=45 + (seq % 6) * 5,
                 is_active=(seq % 5 != 0),
                 role_id=role.id,
                 location_id=location.id,

@@ -1,7 +1,27 @@
-import { Link, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
 export default function PublicLayout() {
+  const location = useLocation();
+
+  const scrollToHash = () => {
+    if (!location.hash) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const targetId = location.hash.replace("#", "");
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  useEffect(() => {
+    const id = window.requestAnimationFrame(scrollToHash);
+    return () => window.cancelAnimationFrame(id);
+  }, [location.pathname, location.hash]);
+
   return (
     <div className="public-site">
       <Navbar />

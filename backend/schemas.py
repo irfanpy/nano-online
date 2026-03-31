@@ -1,4 +1,4 @@
-from datetime import date, time
+from datetime import date, datetime, time
 
 from pydantic import BaseModel, ConfigDict
 
@@ -15,6 +15,28 @@ class TokenResponse(BaseModel):
 
 class ProfileResponse(BaseModel):
     username: str
+
+
+class UserRegisterRequest(BaseModel):
+    name: str
+    email: str
+    phone: str
+    password: str
+    address: str
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UserProfileResponse(BaseModel):
+    id: int
+    name: str
+    email: str
+    phone: str
+    address: str
+    created_at: datetime
 
 
 class PaginatedResponse(BaseModel):
@@ -76,6 +98,7 @@ class HelperCreateRequest(BaseModel):
     address: str
     role_id: int
     notes: str | None = None
+    hourly_rate: float | None = None
     is_active: bool = True
     location_id: int | None = None
 
@@ -92,9 +115,12 @@ class HelperResponse(BaseModel):
     role_id: int
     role_name: str
     notes: str | None = None
+    hourly_rate: float | None = None
     is_active: bool
     location_id: int | None = None
     location_name: str | None = None
+
+
 
 
 # ── Employers ──────────────────────────────────────────
@@ -287,6 +313,22 @@ class ExperienceResponse(BaseModel):
     responsibilities: str | None = None
 
 
+class PublicHelperResponse(BaseModel):
+    id: int
+    full_name: str
+    role_name: str
+    notes: str | None = None
+    hourly_rate: float | None = None
+    is_active: bool
+    location_name: str | None = None
+    availability: list[AvailabilityResponse] = []
+    skills: list[SkillResponse] = []
+
+
+class PublicHelperDetailResponse(PublicHelperResponse):
+    experience: list[ExperienceResponse] = []
+
+
 # ── Documents ──────────────────────────────────────────
 
 class DocumentCreateRequest(BaseModel):
@@ -313,3 +355,49 @@ class DocumentResponse(BaseModel):
     expiry_date: date | None = None
     document_status: str
     notes: str | None = None
+
+
+# ── Bookings ──────────────────────────────────────────
+
+class BookingCreateRequest(BaseModel):
+    helper_id: int
+    date: date
+    start_time: time
+    end_time: time
+    status: str = "pending"
+    total_price: float | None = None
+
+
+class BookingRescheduleRequest(BaseModel):
+    date: date
+    start_time: time
+    end_time: time
+
+
+class BookingResponse(BaseModel):
+    id: int
+    user_id: int
+    helper_id: int
+    helper_name: str
+    date: date
+    start_time: time
+    end_time: time
+    status: str
+    total_price: float | None = None
+    created_at: datetime
+    has_review: bool = False
+
+
+class ReviewCreateRequest(BaseModel):
+    rating: int | None = None
+    comment: str
+
+
+class ReviewResponse(BaseModel):
+    id: int
+    booking_id: int
+    user_id: int
+    helper_id: int
+    rating: int | None = None
+    comment: str
+    created_at: datetime

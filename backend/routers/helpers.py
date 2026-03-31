@@ -40,6 +40,7 @@ def create_helper(
         address=address,
         role_id=body.role_id,
         notes=body.notes,
+        hourly_rate=body.hourly_rate,
         is_active=body.is_active,
         location_id=body.location_id,
         created_by_id=user.id,
@@ -71,6 +72,7 @@ def update_helper(
     helper.address = normalize_name(body.address, "Address")
     helper.role_id = body.role_id
     helper.notes = body.notes
+    helper.hourly_rate = body.hourly_rate
     helper.is_active = body.is_active
     helper.location_id = body.location_id
     db.commit()

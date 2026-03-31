@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import ServiceCard from "../components/ServiceCard.jsx";
 import { SERVICES } from "../data/servicesData.js";
 
@@ -36,6 +38,25 @@ const FAQS = [
 ];
 
 export default function ServicesPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!location.hash) return;
+    const raw = location.hash.replace("#", "").toLowerCase();
+    const categoryMap = {
+      babysitter: "Babysitter",
+      nanny: "Nanny",
+      cook: "Cooking",
+      driver: "Driver",
+      "maid-service": "Cleaning"
+    };
+    const category = categoryMap[raw];
+    if (category) {
+      navigate(`/helpers?category=${encodeURIComponent(category)}`, { replace: true });
+    }
+  }, [location.hash, navigate]);
+
   return (
     <div>
       <section className="public-section">

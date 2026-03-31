@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useUserAuth } from "../context/UserAuthContext.jsx";
 
 const NAV_ITEMS = [
   { to: "/", label: "Home", end: true },
@@ -9,6 +10,8 @@ const NAV_ITEMS = [
 ];
 
 export default function Navbar() {
+  const { isAuthenticated, user, logout } = useUserAuth();
+
   return (
     <header className="public-header">
       <div className="public-container public-header-inner">
@@ -23,6 +26,24 @@ export default function Navbar() {
               {label}
             </NavLink>
           ))}
+          {isAuthenticated ? (
+            <NavLink to="/dashboard" className="public-nav-link">
+              {user?.name || user?.email || "Dashboard"}
+            </NavLink>
+          ) : (
+            <NavLink to="/login" className="public-nav-link">
+              Sign in
+            </NavLink>
+          )}
+          {isAuthenticated ? (
+            <button type="button" className="public-nav-button" onClick={logout}>
+              Sign out
+            </button>
+          ) : (
+            <NavLink to="/register" className="public-nav-link highlight">
+              Get started
+            </NavLink>
+          )}
         </nav>
       </div>
     </header>

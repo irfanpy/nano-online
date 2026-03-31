@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from sqlalchemy import (
     Boolean,
     Column,
     Date,
+    DateTime,
     Float,
     ForeignKey,
     Integer,
@@ -28,12 +31,19 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(64), unique=True, nullable=False, index=True)
+    name = Column(String(120), nullable=True)
+    email = Column(String(255), unique=True, nullable=True, index=True)
+    phone = Column(String(32), nullable=True)
+    address = Column(String(255), nullable=True)
     password_hash = Column(String(255), nullable=False)
     is_admin = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     helper_roles = relationship("HelperRole", back_populates="created_by")
     helpers = relationship("Helper", back_populates="created_by")
     employers = relationship("Employer", back_populates="created_by")
+    bookings = relationship("Booking", back_populates="user")
+    reviews = relationship("Review", back_populates="user")
 
 
 class Location(Base):
@@ -71,6 +81,7 @@ class Helper(Base):
     phone = Column(String(32), nullable=False)
     address = Column(String(255), nullable=False)
     notes = Column(String(255), nullable=True)
+    hourly_rate = Column(Float, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     role_id = Column(Integer, ForeignKey("helper_roles.id"), nullable=False)
     created_by_id = Column(Integer, ForeignKey("users.id"), nullable=False)
@@ -94,6 +105,8 @@ class Helper(Base):
         secondary=helper_skills_table,
         back_populates="helpers",
     )
+    bookings = relationship("Booking", back_populates="helper")
+    reviews = relationship("Review", back_populates="helper")
 
 
 class Employer(Base):
@@ -216,3 +229,37 @@ class HelperDocument(Base):
     notes = Column(String(500), nullable=True)
 
     helper = relationship("Helper", back_populates="documents")
+
+
+class Booking(Base):
+    __tablename__ = "bookings"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    helper_id = Column(Integer, ForeignKey("helpers.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    start_time = Column(Time, nullable=False)
+    end_time = Column(Time, nullable=False)
+    status = Column(String(32), nullable=False, default="pending")
+    total_price = Column(Float, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user = relationship("User", back_populates="bookings")
+    helper = relationship("Helper", back_populates="bookings")
+    review = relationship("Review", back_populates="booking", uselist=False)
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+
+    id = Column(Integer, primary_key=True, index=True)
+    booking_id = Column(Integer, ForeignKey("bookings.id"), nullable=False, unique=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    helper_id = Column(Integer, ForeignKey("helpers.id"), nullable=False)
+    rating = Column(Integer, nullable=True)
+    comment = Column(String(1000), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    booking = relationship("Booking", back_populates="review")
+    user = relationship("User", back_populates="reviews")
+    helper = relationship("Helper", back_populates="reviews")

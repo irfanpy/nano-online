@@ -25,6 +25,7 @@ export default function HelperFormPage({ token }) {
     role_id: "",
     location_id: "",
     notes: "",
+    hourly_rate: "",
     is_active: true
   });
 
@@ -55,6 +56,7 @@ export default function HelperFormPage({ token }) {
           role_id: String(helper.role_id),
           location_id: helper.location_id ? String(helper.location_id) : "",
           notes: helper.notes || "",
+          hourly_rate: helper.hourly_rate ? String(helper.hourly_rate) : "",
           is_active: helper.is_active
         });
       } catch (error) {
@@ -70,7 +72,8 @@ export default function HelperFormPage({ token }) {
     const payload = {
       ...form,
       role_id: Number(form.role_id),
-      location_id: form.location_id ? Number(form.location_id) : null
+      location_id: form.location_id ? Number(form.location_id) : null,
+      hourly_rate: form.hourly_rate ? Number(form.hourly_rate) : null
     };
 
     try {
@@ -146,6 +149,16 @@ export default function HelperFormPage({ token }) {
               </option>
             ))}
           </select>
+        </label>
+        <label>
+          Hourly Rate (AED)
+          <input
+            type="number"
+            min="0"
+            value={form.hourly_rate}
+            onChange={(event) => setForm((prev) => ({ ...prev, hourly_rate: event.target.value }))}
+            placeholder="45"
+          />
         </label>
         <label className="full-width">
           Notes

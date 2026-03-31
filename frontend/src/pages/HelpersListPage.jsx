@@ -44,6 +44,7 @@ export default function HelpersListPage({ token }) {
             <th>ID</th>
             <th>Full Name</th>
             <th>Role</th>
+            <th>Hourly Rate</th>
             <th>Phone</th>
             <th>Address (UAE)</th>
             <th>Status</th>
@@ -56,6 +57,7 @@ export default function HelpersListPage({ token }) {
               <td>{helper.id}</td>
               <td>{helper.full_name}</td>
               <td>{helper.role_name}</td>
+              <td>{helper.hourly_rate ? `AED ${helper.hourly_rate}` : "-"}</td>
               <td>{helper.phone}</td>
               <td>{helper.address}</td>
               <td>{helper.is_active ? "Active" : "Inactive"}</td>
